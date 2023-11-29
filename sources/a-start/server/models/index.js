@@ -27,7 +27,15 @@ const getColors = async () => {
   return colors;
 };
 
+const addColor = async (color) => {
+  const db = await getDb();
+  const result = await db.collection(COLOR_COLLECTION).insertOne(color);
+
+  return result;
+};
+
 module.exports = {
   getUserByEmailAndPassword,
   getColors,
+  addColor,
 };

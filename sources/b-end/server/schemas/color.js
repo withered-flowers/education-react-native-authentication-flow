@@ -1,4 +1,4 @@
-const { getColors } = require("../models");
+const { getColors, addColor } = require("../models");
 
 const typeDefs = `#graphql
   type Color {
@@ -9,8 +9,19 @@ const typeDefs = `#graphql
     pantone_value: String
   }
 
+  input ColorInput {
+    name: String!
+    year: Int!
+    color: String!
+    pantone_value: String!
+  }
+
   type Query {
     colors: ResponseColor
+  }
+
+  type Mutation {
+    colorAdd(color: ColorInput): ResponseColorAdd
   }
 `;
 
@@ -24,6 +35,19 @@ const resolvers = {
         statusCode: 200,
         message: `${id}-${randomNumber}`,
         data: colors,
+      };
+    },
+  },
+  Mutation: {
+    colorAdd: async (_, { color }, contextValue) => {
+      const { id, randomNumber } = contextValue.doAuthentication();
+
+      const newColor = await addColor(color);
+
+      return {
+        statusCode: 200,
+        message: `${id}-${randomNumber}`,
+        data: newColor,
       };
     },
   },
