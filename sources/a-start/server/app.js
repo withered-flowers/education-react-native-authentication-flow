@@ -1,46 +1,44 @@
-const { ApolloServer } = require("@apollo/server");
-const { startStandaloneServer } = require("@apollo/server/standalone");
-const { colorTypeDefs, colorResolvers } = require("./schemas/color");
-const { responseTypeDefs } = require("./schemas/response");
-const { userTypeDefs, userResolvers } = require("./schemas/user");
-const { getClientInstance } = require("./config/db");
-const { GraphQLError } = require("graphql");
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import { GraphQLError } from "graphql";
+import { getClientInstance } from "./config/db.js";
+import { colorResolvers, colorTypeDefs } from "./schemas/color.js";
+import { responseTypeDefs } from "./schemas/response.js";
+import { userResolvers, userTypeDefs } from "./schemas/user.js";
 
 const server = new ApolloServer({
-  typeDefs: [colorTypeDefs, userTypeDefs, responseTypeDefs],
-  resolvers: [colorResolvers, userResolvers],
+	typeDefs: [colorTypeDefs, userTypeDefs, responseTypeDefs],
+	resolvers: [colorResolvers, userResolvers],
 });
 
-(async () => {
-  const { url } = await startStandaloneServer(server, {
-    listen: {
-      port: 4000,
-    },
-    context: async ({ req, res }) => {
-      await getClientInstance();
+const { url } = await startStandaloneServer(server, {
+	listen: {
+		port: 4000,
+	},
+	context: async ({ req, res }) => {
+		await getClientInstance();
 
-      return {
-        doAuthentication: () => {
-          // !! In a real world scenario we need to validate the token
-          // !! and return the user data
+		return {
+			doAuthentication: () => {
+				// !! In a real world scenario we need to validate the token
+				// !! and return the user data
 
-          if (!req.headers.authorization) {
-            throw new GraphQLError("Unauthorized");
-          }
+				if (!req.headers.authorization) {
+					throw new GraphQLError("Unauthorized");
+				}
 
-          const token = req.headers.authorization.split(" ")[1];
+				const token = req.headers.authorization.split(" ")[1];
 
-          // ?? Remember the format is <userId>.<randomString>
-          const [userId, randomNumber] = token.split(".");
+				// ?? Remember the format is <userId>.<randomString>
+				const [userId, randomNumber] = token.split(".");
 
-          return {
-            id: userId,
-            randomNumber,
-          };
-        },
-      };
-    },
-  });
+				return {
+					id: userId,
+					randomNumber,
+				};
+			},
+		};
+	},
+});
 
-  console.log(`🚀  Server ready at ${url}`);
-})();
+console.log(`🚀  Server ready at ${url}`);
