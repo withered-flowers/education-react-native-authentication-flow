@@ -1,4 +1,4 @@
-const { getColors, addColor } = require("../models");
+import { addColor, getColors } from "../models/index.js";
 
 const typeDefs = `#graphql
   type Color {
@@ -26,34 +26,32 @@ const typeDefs = `#graphql
 `;
 
 const resolvers = {
-  Query: {
-    colors: async (_, __, contextValue) => {
-      const { id, randomNumber } = contextValue.doAuthentication();
-      const colors = await getColors();
+	Query: {
+		colors: async (_, __, contextValue) => {
+			const { id, randomNumber } = contextValue.doAuthentication();
+			const colors = await getColors();
 
-      return {
-        statusCode: 200,
-        message: `${id}-${randomNumber}`,
-        data: colors,
-      };
-    },
-  },
-  Mutation: {
-    colorAdd: async (_, { color }, contextValue) => {
-      const { id, randomNumber } = contextValue.doAuthentication();
+			return {
+				statusCode: 200,
+				message: `${id}-${randomNumber}`,
+				data: colors,
+			};
+		},
+	},
+	Mutation: {
+		colorAdd: async (_, { color }, contextValue) => {
+			const { id, randomNumber } = contextValue.doAuthentication();
 
-      const newColor = await addColor(color);
+			const newColor = await addColor(color);
 
-      return {
-        statusCode: 200,
-        message: `${id}-${randomNumber}`,
-        data: newColor,
-      };
-    },
-  },
+			return {
+				statusCode: 200,
+				message: `${id}-${randomNumber}`,
+				data: newColor,
+			};
+		},
+	},
 };
 
-module.exports = {
-  colorTypeDefs: typeDefs,
-  colorResolvers: resolvers,
-};
+export const colorTypeDefs = typeDefs;
+export const colorResolvers = resolvers;

@@ -1,4 +1,4 @@
-const { getUserByEmailAndPassword } = require("../models");
+import { getUserByEmailAndPassword } from "../models/index.js";
 
 const typeDefs = `#graphql
   type User {
@@ -19,27 +19,25 @@ const typeDefs = `#graphql
 `;
 
 const resolvers = {
-  Query: {
-    login: async (_, args) => {
-      const { inputLogin } = args;
-      const { email, password } = inputLogin;
+	Query: {
+		login: async (_, args) => {
+			const { inputLogin } = args;
+			const { email, password } = inputLogin;
 
-      const user = await getUserByEmailAndPassword(email, password);
+			const user = await getUserByEmailAndPassword(email, password);
 
-      return {
-        statusCode: 200,
-        message: "OK",
-        data: {
-          // ?? Custom Token: <userId>.<randomString>
-          // !! Never use this type of token in production
-          token: `${user._id}.1234567890`,
-        },
-      };
-    },
-  },
+			return {
+				statusCode: 200,
+				message: "OK",
+				data: {
+					// ?? Custom Token: <userId>.<randomString>
+					// !! Never use this type of token in production
+					token: `${user._id}.1234567890`,
+				},
+			};
+		},
+	},
 };
 
-module.exports = {
-  userTypeDefs: typeDefs,
-  userResolvers: resolvers,
-};
+export const userTypeDefs = typeDefs;
+export const userResolvers = resolvers;

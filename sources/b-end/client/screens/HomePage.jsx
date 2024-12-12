@@ -1,4 +1,5 @@
-import { FlatList, View, Text, StyleSheet, Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 // ?? We will implement the Logout using securestore and context
 import * as SecureStore from "expo-secure-store";
@@ -28,105 +29,107 @@ import { GET_COLORS } from "../queries";
 
 // ?? We will modify the ItemComponent to accept color props
 const ItemComponent = ({ title, color }) => (
-  // ?? We will also modify the style to use the color props
-  <View style={{ ...styles.item, backgroundColor: color }}>
-    <Text style={styles.itemTitle}>{title}</Text>
-  </View>
+	// ?? We will also modify the style to use the color props
+	<View style={{ ...styles.item, backgroundColor: color }}>
+		<Text style={styles.itemTitle}>{title}</Text>
+	</View>
 );
 
-const HomePage = ({ navigation }) => {
-  // ?? Use the useQuery hook to query the data
-  const { loading, error, data } = useQuery(GET_COLORS);
+const HomePage = () => {
+	const navigation = useNavigation();
 
-  // ?? Use the setIsloggedIn from the LoginContext
-  const { setIsLoggedIn } = useContext(LoginContext);
+	// ?? Use the useQuery hook to query the data
+	const { loading, error, data } = useQuery(GET_COLORS);
 
-  const addColorOnPressHandler = () => {
-    console.log("Add Color Pressed");
-    navigation.navigate("ColorAdd");
-  };
+	// ?? Use the setIsloggedIn from the LoginContext
+	const { setIsLoggedIn } = useContext(LoginContext);
 
-  const logoutOnPressHandler = async () => {
-    console.log("Logout Pressed");
+	const addColorOnPressHandler = () => {
+		console.log("Add Color Pressed");
+		navigation.navigate("ColorAdd");
+	};
 
-    // ?? We will remove the token from the securestore
-    await SecureStore.deleteItemAsync("token");
+	const logoutOnPressHandler = async () => {
+		console.log("Logout Pressed");
 
-    // ?? We will set the isLoggedIn to false
-    setIsLoggedIn(false);
+		// ?? We will remove the token from the securestore
+		await SecureStore.deleteItemAsync("token");
 
-    // !! No need to navigate to LoginPage, since we already use the LoginContext to determine which Stack to use
-  };
+		// ?? We will set the isLoggedIn to false
+		setIsLoggedIn(false);
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+		// !! No need to navigate to LoginPage, since we already use the LoginContext to determine which Stack to use
+	};
 
-  if (!loading && error) {
-    return <Text>Error: {error.message}</Text>;
-  }
+	if (loading) {
+		return <Text>Loading...</Text>;
+	}
 
-  // ?? We will use the data from the query
-  if (!loading && data) {
-    // ?? We will console log the data to see what we get
-    console.log(JSON.stringify(data, null, 2));
+	if (!loading && error) {
+		return <Text>Error: {error.message}</Text>;
+	}
 
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: "center", marginTop: 8 }}>
-          {data.colors.message}
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={addColorOnPressHandler}>
-            <Text style={styles.buttonText}>Add Colors</Text>
-          </Pressable>
-          <Pressable style={styles.button} onPress={logoutOnPressHandler}>
-            <Text style={styles.buttonText}>Logout</Text>
-          </Pressable>
-        </View>
-        <FlatList
-          data={data.colors.data}
-          renderItem={({ item }) => (
-            <ItemComponent title={item.name} color={item.color} />
-          )}
-          keyExtractor={(item) => item._id}
-        />
-      </View>
-    );
-  }
+	// ?? We will use the data from the query
+	if (!loading && data) {
+		// ?? We will console log the data to see what we get
+		console.log(JSON.stringify(data, null, 2));
+
+		return (
+			<View style={styles.container}>
+				<Text style={{ textAlign: "center", marginTop: 8 }}>
+					{data.colors.message}
+				</Text>
+				<View style={styles.buttonContainer}>
+					<Pressable style={styles.button} onPress={addColorOnPressHandler}>
+						<Text style={styles.buttonText}>Add Colors</Text>
+					</Pressable>
+					<Pressable style={styles.button} onPress={logoutOnPressHandler}>
+						<Text style={styles.buttonText}>Logout</Text>
+					</Pressable>
+				</View>
+				<FlatList
+					data={data.colors.data}
+					renderItem={({ item }) => (
+						<ItemComponent title={item.name} color={item.color} />
+					)}
+					keyExtractor={(item) => item._id}
+				/>
+			</View>
+		);
+	}
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  buttonContainer: {
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 8,
-  },
-  button: {
-    padding: 8,
-    backgroundColor: "#fef08a",
-    borderRadius: 5,
-    marginTop: 8,
-  },
-  buttonText: {
-    fontSize: 20,
-  },
-  item: {
-    backgroundColor: "#fef08a",
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
-  },
-  itemTitle: {
-    fontSize: 32,
-    color: "#334155",
-    opacity: 0.9,
-  },
+	container: {
+		flex: 1,
+		backgroundColor: "#fff",
+	},
+	buttonContainer: {
+		justifyContent: "center",
+		flexDirection: "row",
+		gap: 8,
+	},
+	button: {
+		padding: 8,
+		backgroundColor: "#fef08a",
+		borderRadius: 5,
+		marginTop: 8,
+	},
+	buttonText: {
+		fontSize: 20,
+	},
+	item: {
+		backgroundColor: "#fef08a",
+		padding: 20,
+		marginVertical: 8,
+		marginHorizontal: 16,
+		borderRadius: 5,
+	},
+	itemTitle: {
+		fontSize: 32,
+		color: "#334155",
+		opacity: 0.9,
+	},
 });
 
 export default HomePage;

@@ -32,6 +32,4 @@ const typeDefs = `#graphql
   }
 `;
 
-module.exports = {
-  responseTypeDefs: typeDefs,
-};
+export const responseTypeDefs = typeDefs;
